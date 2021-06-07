@@ -107,11 +107,13 @@ class Model(object):
             # Output of model
             # Minimize error using cross entropy
             if output_node==1:
-                weights = tf.get_variable('weights', [1, 1],
+                # jcyang: n-1 layer can be any node now instead of just 1
+                weights = tf.get_variable('weights', [prev_node, 1],
                                               initializer=tf.truncated_normal_initializer(stddev=stddev_input))
                 self.nnweights.append(weights)
                 biases = tf.get_variable('biases', [1],
                                          initializer=tf.constant_initializer(0.0))
+                self.nnweights.append(biases)
                 
                 layer_out = tf.layers.batch_normalization(layer_out, training=is_train)
                 pred = (tf.matmul(layer_out, weights) + biases)
