@@ -13,6 +13,7 @@ class Model(object):
                  display_step, 
                  activation,
                  feature_selection=True,
+                 batch_normalization=True,
                  a = 1,
                  sigma = 0.5,
                  lam = 0.5, 
@@ -36,6 +37,7 @@ class Model(object):
             X = tf.placeholder(tf.float32, [None, input_node]) # X.shape == [batch_size, feature_size]
             y = tf.placeholder(tf.float32, [None, output_node])
             train_gates = tf.placeholder(tf.float32,[1], name='train_gates')
+            
             is_train = tf.placeholder(tf.bool,[], name='is_train') # for batch normalization
             
             self.gatesweights=[]
@@ -84,8 +86,8 @@ class Model(object):
                     biases = tf.get_variable('biases', [hidden_layers_node[i]],
                                              initializer=tf.constant_initializer(0.0))
                     self.nnweights.append(biases)
-                    
-                    prev_x = tf.layers.batch_normalization(prev_x, training=is_train)
+                    if batch_normalization:
+                        prev_x = tf.layers.batch_normalization(prev_x, training=is_train)
                     layer_out = (tf.matmul(prev_x, weights) + biases)
                
                     if activation == 'relu':
@@ -114,8 +116,8 @@ class Model(object):
                 biases = tf.get_variable('biases', [1],
                                          initializer=tf.constant_initializer(0.0))
                 self.nnweights.append(biases)
-                
-                layer_out = tf.layers.batch_normalization(layer_out, training=is_train)
+                if batch_normalization:
+                    layer_out = tf.layers.batch_normalization(layer_out, training=is_train)
                 pred = (tf.matmul(layer_out, weights) + biases)
                 loss_fun = tf.reduce_mean(tf.squared_difference(pred, y))
                 pred_log = (layer_out)
@@ -127,7 +129,8 @@ class Model(object):
                 biases = tf.get_variable('biases', [2],
                                              initializer=tf.constant_initializer(0.0))
                 self.nnweights.append(biases)
-                prev_x = tf.layers.batch_normalization(prev_x, training=is_train)
+                if batch_normalization:
+                    prev_x = tf.layers.batch_normalization(prev_x, training=is_train)
                 layer_out = (tf.matmul(prev_x, weights) + biases)
                 if activation == 'relu':
                         layer_out = tf.nn.relu(layer_out)                        
@@ -161,9 +164,13 @@ class Model(object):
             else:
                 loss = loss_fun
                 self.reg_gates = tf.constant(0.)
+            
             # Get Optimizer
-            update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
-            with tf.control_dependencies(update_ops):
+            if batch_normalization:
+                update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+                with tf.control_dependencies(update_ops):
+                    train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(loss)
+            else:
                 train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(loss)
             # For evaluation
             correct_prediction = tf.equal(tf.argmax(pred, 1), tf.argmax(y, 1))
@@ -184,6 +191,7 @@ class Model(object):
         self.correct_prediction = correct_prediction
         self.accuracy = accuracy
         self.output_node=output_node
+        self.batch_normalization = batch_normalization
         self.weights=weights
         self.biases=biases
         # set random state
