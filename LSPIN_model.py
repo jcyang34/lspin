@@ -129,21 +129,23 @@ class Model(object):
                 biases = tf.get_variable('biases', [2],
                                              initializer=tf.constant_initializer(0.0))
                 self.nnweights.append(biases)
+                
                 if batch_normalization:
                     prev_x = tf.layers.batch_normalization(prev_x, training=is_train)
                 layer_out = (tf.matmul(prev_x, weights) + biases)
+                
                 if activation == 'relu':
-                        layer_out = tf.nn.relu(layer_out)                        
-                    elif activation == 'l_relu':
-                        layer_out = tf.nn.leaky_relu(layer_out)
-                    elif activation == 'sigmoid':
-                        layer_out = tf.nn.sigmoid(layer_out)
-                    elif activation == 'tanh':
-                        layer_out = tf.nn.tanh(layer_out)
-                    elif activation == 'none':
-                        layer_out =(layer_out)
-                    else:
-                        raise NotImplementedError('activation not recognized')
+                    layer_out = tf.nn.relu(layer_out)                        
+                elif activation == 'l_relu':
+                    layer_out = tf.nn.leaky_relu(layer_out)
+                elif activation == 'sigmoid':
+                    layer_out = tf.nn.sigmoid(layer_out)
+                elif activation == 'tanh':
+                    layer_out = tf.nn.tanh(layer_out)
+                elif activation == 'none':
+                    layer_out =(layer_out)
+                else:
+                    raise NotImplementedError('activation not recognized')
                 prev_node = 2
                 prev_x = layer_out
                 
