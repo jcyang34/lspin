@@ -7,7 +7,7 @@ class Model(object):
                  input_node,
                  hidden_layers_node,
                  output_node,
-                 feature_selection_dimension,
+                 gating_net_hidden_layers_node,
                  learning_rate,
                  batch_size,
                  display_step, 
@@ -20,7 +20,24 @@ class Model(object):
                  stddev_input=0.1,
                  seed=1,
         ): 
-        
+        """ LSPIN Model
+        # Arguments:
+            input_node: integer, input dimension of the prediction network
+            hidden_layers_node: list, number of nodes for each hidden layer for the prediction net, example: [200,200]
+            output_node: integer, number of nodes for the output layer of the prediction net, 1 (regression) or 2 (classification)
+            gating_net_hidden_layers_node: list, number of nodes for each hidden layer of the gating net, example: [200,200]
+            learning_rate: float, learning rate of SGD
+            batch_size: integer, batch size
+            display_step: integer, number of epochs to output info
+            activation: string, activation function of the prediction net: 'relu', 'l_relu', 'sigmoid', 'tanh', or 'none'
+            feature_selection: bool, if using the gating net
+            a: float, 
+            sigma: float, std of the gaussion reparameterization 
+            lam: float, regularization parameter of the L0 penalty
+            stddev_input: float, std of the normal initializer for the network weights
+            seed: integer, random seed
+        """
+
         # Register hyperparameters of LSPIN
         self.a = a
         self.sigma = sigma
@@ -47,13 +64,13 @@ class Model(object):
             
             # Gating network
             if feature_selection:
-                for i in range(len(feature_selection_dimension)):
+                for i in range(len(gating_net_hidden_layers_node)):
                     gates_layer_name = 'gate_layer' + str(i+1)
                     
                     with tf.variable_scope(gates_layer_name, reuse=tf.AUTO_REUSE):
-                        weights = tf.get_variable('weights', [prev_node, feature_selection_dimension[i]],
+                        weights = tf.get_variable('weights', [prev_node, gating_net_hidden_layers_node[i]],
                                                   initializer=tf.truncated_normal_initializer(stddev=stddev_input))
-                        biases = tf.get_variable('biases', [feature_selection_dimension[i]],
+                        biases = tf.get_variable('biases', [gating_net_hidden_layers_node[i]],
                                                  initializer=tf.constant_initializer(0.0))
                     
                         self.gatesweights.append(weights)
@@ -61,7 +78,7 @@ class Model(object):
                         
                         gates_layer_out = tf.nn.tanh(tf.matmul(prev_x,weights)+biases)
 
-                        prev_node = feature_selection_dimension[i]
+                        prev_node = gating_net_hidden_layers_node[i]
                         prev_x = gates_layer_out        
                 weights2 = tf.get_variable('weights2', [prev_node,input_node],
                                                   initializer=tf.truncated_normal_initializer(stddev=stddev_input))
@@ -193,7 +210,6 @@ class Model(object):
         self.correct_prediction = correct_prediction
         self.accuracy = accuracy
         self.output_node=output_node
-        self.batch_normalization = batch_normalization
         self.weights=weights
         self.biases=biases
         # set random state
