@@ -12,5 +12,6 @@ setup(name='lspin',
           'tensorflow-gpu==1.15.2',
           'optuna',
           'sklearn',
+          'matplotlib==3.1.2',
       ],
       zip_safe=False)
