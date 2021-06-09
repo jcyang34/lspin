@@ -9,6 +9,8 @@ This repo includes the model codes of Locally Linear SParse Interpretable Networ
 * matplotlib==3.1.2
 * optuna
 * sklearn
+
+#### Installation from github:
 ```
 git clone https://github.com/jcyang34/lspin.git
 cd lspin
