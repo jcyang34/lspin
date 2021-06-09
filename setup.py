@@ -9,7 +9,7 @@ setup(name='lspin',
       license='MIT',
       packages=['lspin'],
       install_requires=[
-          'tensorflow-gpu==1.15.2',
+          'tensorflow-gpu==1.15',
           'optuna',
           'sklearn',
       ],
