@@ -345,9 +345,9 @@ class Model(object):
                                                                                   avg_loss, valid_loss))
                 print("train reg_fs: {}".format(reg_fs))                
                 
-        print("Optimization Finished!")
+        #print("Optimization Finished!")
         test_acc, test_loss = self.eval(dataset.test_data, dataset.test_labels)
-        print("test loss: {}, test acc: {}".format(test_loss, test_acc))
+        #print("test loss: {}, test acc: {}".format(test_loss, test_acc))
         self.acc=test_acc # used for recording test acc for figures
         return train_accuracies, train_losses, val_accuracies, val_losses 
                                        
@@ -365,7 +365,7 @@ class Model(object):
         Get the test acc and loss
         """
         acc, loss = self.eval(X, y)
-        print("test loss: {}, test acc: {}".format(loss, acc))
-        print("Saving model..")
+        #print("test loss: {}, test acc: {}".format(loss, acc))
+        #print("Saving model..")
         return acc, loss
 
