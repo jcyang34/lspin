@@ -138,12 +138,12 @@ class Model(object):
                 pred = (tf.matmul(layer_out, weights) + biases)
                 loss_fun = tf.reduce_mean(tf.squared_difference(pred, y))
                 pred_log = (layer_out)
-            elif output_node==2:
+            else:
                 # jcyang: add the output layer here
-                weights = tf.get_variable('weights', [prev_node, 2],
+                weights = tf.get_variable('weights', [prev_node, output_node],
                                               initializer=tf.truncated_normal_initializer(stddev=stddev_input))
                 self.nnweights.append(weights)
-                biases = tf.get_variable('biases', [2],
+                biases = tf.get_variable('biases', [output_node],
                                              initializer=tf.constant_initializer(0.0))
                 self.nnweights.append(biases)
                 
@@ -163,14 +163,12 @@ class Model(object):
                     layer_out =(layer_out)
                 else:
                     raise NotImplementedError('activation not recognized')
-                prev_node = 2
+                prev_node = output_node
                 prev_x = layer_out
                 
                 pred = tf.nn.softmax(layer_out)
                 pred_log = (layer_out)
                 loss_fun = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y, logits=layer_out))
-            else:
-                raise ValueError('wrong ouput_node: only support 1 or 2')
             
             if feature_selection:
                 # gates regularization
