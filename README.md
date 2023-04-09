@@ -7,12 +7,12 @@ This folder includes the model codes of Locally Linear SParse Interpretable Netw
 #### Key Dependencies: 
 * tensorflow-gpu==1.15.2
 * matplotlib==3.1.2
-* optuna
 * sklearn
 
 ## Usage:
 
-See Demo1.ipynb and Demo2.ipynb for detail usage of LLSPIN and LPSIN
+Demo0.ipynb is a demonstration of LLSPIN on a simple linear synthetic data. Demo1.ipynb and Demo2.ipynb demonstrate the usage LLSPIN and LPSIN
+on more complex data.
 
 ## Reference:
 ```
